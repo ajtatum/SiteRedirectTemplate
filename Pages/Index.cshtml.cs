@@ -18,7 +18,7 @@ namespace SiteRedirectTemplate.Pages
             _config = config;
         }
 
-        public IActionResult OnGet(int? id = null)
+        public IActionResult OnGet(string id = null)
         {
             if (id != null)
             {
