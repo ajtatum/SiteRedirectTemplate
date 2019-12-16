@@ -26,27 +26,32 @@ namespace SiteRedirectTemplate.Pages
 
                 using (var connection = new SqlConnection(sqlConnectionString))
                 {
-                    var shortenedUrl = connection.QueryFirst<AJT.Dtos.ShortenedUrlDto>("SELECT * FROM ShortenedUrls WHERE Token = @Token AND Domain = '@Domain'", new {Token = id, Domain = _config["Domain"]});
-
-                    if (shortenedUrl == null)
-                        return new RedirectResult($"https://api.ajt.io?Message=The token {id} no longer exists.", false);
-
-                    var click = new AJT.Dtos.ShortenedUrlClickDto()
+                    try
                     {
-                        ShortenedUrlId = shortenedUrl.Id,
-                        ClickDate = DateTime.Now,
-                        Referrer = HttpContext.Request.Headers[HeaderNames.Referer].ToString().Truncate(500, false)
-                    };
+                        var shortenedUrl = connection.QueryFirst<AJT.Dtos.ShortenedUrlDto>("SELECT * FROM ShortenedUrls WHERE Token = @Token AND Domain = @Domain", new { Token = id, Domain = _config["Domain"] });
 
-                    connection.Execute("INSERT INTO ShortenedUrlClicks (ShortenedUrlId, ClickDate, Referrer) VALUES (@ShortenedUrlId, @ClickDate, @Referrer)", new {click.ShortenedUrlId, click.ClickDate, click.Referrer});
+                        if (shortenedUrl == null)
+                            return new RedirectResult($"https://api.ajt.io?Message=The token {id} no longer exists.", false);
 
-                    return new RedirectResult(shortenedUrl.LongUrl, false);
+                        var click = new AJT.Dtos.ShortenedUrlClickDto()
+                        {
+                            ShortenedUrlId = shortenedUrl.Id,
+                            ClickDate = DateTime.Now,
+                            Referrer = HttpContext.Request.Headers[HeaderNames.Referer].ToString().Truncate(500, false)
+                        };
+
+                        connection.Execute("INSERT INTO ShortenedUrlClicks (ShortenedUrlId, ClickDate, Referrer) VALUES (@ShortenedUrlId, @ClickDate, @Referrer)", new { click.ShortenedUrlId, click.ClickDate, click.Referrer });
+
+                        return new RedirectResult(shortenedUrl.LongUrl, false);
+                    }
+                    catch (Exception ex)
+                    {
+                        return new RedirectResult($"https://api.ajt.io?Message=Error: Sorry, there was an error with {id}. Sign up here to create your own short urls and more!", false);
+                    }
                 }
             }
-            else
-            {
-                return new RedirectResult($"https://api.ajt.io?Message=Create your own short short url by signing up here.", false);
-            }
+
+            return Page();
         }
     }
 }
