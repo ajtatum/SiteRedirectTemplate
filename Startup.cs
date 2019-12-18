@@ -51,6 +51,16 @@ namespace SiteRedirectTemplate
                 app.UseHsts();
             }
 
+            // forwarded Header middleware
+            var fordwardedHeaderOptions = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            };
+            fordwardedHeaderOptions.KnownNetworks.Clear();
+            fordwardedHeaderOptions.KnownProxies.Clear();
+
+            app.UseForwardedHeaders(fordwardedHeaderOptions);
+
             app.Use(async (context, next) =>
             {
                 // Request method, scheme, and path
@@ -69,16 +79,6 @@ namespace SiteRedirectTemplate
 
                 await next();
             });
-
-            // forwarded Header middleware
-            var fordwardedHeaderOptions = new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            };
-            fordwardedHeaderOptions.KnownNetworks.Clear();
-            fordwardedHeaderOptions.KnownProxies.Clear();
-
-            app.UseForwardedHeaders(fordwardedHeaderOptions);
 
             app.UseContentSecurityPolicy(new CspDirectiveList
             {
