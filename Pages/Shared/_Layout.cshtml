@@ -9,6 +9,15 @@
     <title>@ViewData["Title"] - @Config["SiteTitle"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+
+    <script type="text/javascript" async src="https://www.googletagmanager.com/gtag/js?id=@Config["GoogleAnalytics"]"></script>
+    <script type="text/javascript">
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', '@Config["GoogleAnalytics"]');
+    </script>
 </head>
 <body>
     <header>

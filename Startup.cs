@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace SiteRedirectTemplate
 {
@@ -38,7 +39,7 @@ namespace SiteRedirectTemplate
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -49,6 +50,25 @@ namespace SiteRedirectTemplate
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+
+            app.Use(async (context, next) =>
+            {
+                // Request method, scheme, and path
+                logger.LogDebug("Request Method: {Method}", context.Request.Method);
+                logger.LogDebug("Request Scheme: {Scheme}", context.Request.Scheme);
+                logger.LogDebug("Request Path: {Path}", context.Request.Path);
+
+                // Headers
+                foreach (var header in context.Request.Headers)
+                {
+                    logger.LogDebug("Header: {Key}: {Value}", header.Key, header.Value);
+                }
+
+                // Connection: RemoteIp
+                logger.LogDebug("Request RemoteIp: {RemoteIpAddress}", context.Connection.RemoteIpAddress);
+
+                await next();
+            });
 
             // forwarded Header middleware
             var fordwardedHeaderOptions = new ForwardedHeadersOptions

@@ -5,6 +5,7 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 
 namespace SiteRedirectTemplate.Pages
@@ -12,10 +13,12 @@ namespace SiteRedirectTemplate.Pages
     public class IndexModel : PageModel
     {
         private readonly IConfiguration _config;
+        private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(IConfiguration config)
+        public IndexModel(IConfiguration config, ILogger<IndexModel> logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         public IActionResult OnGet(string id = null)
@@ -41,6 +44,8 @@ namespace SiteRedirectTemplate.Pages
                         };
 
                         connection.Execute("INSERT INTO ShortenedUrlClicks (ShortenedUrlId, ClickDate, Referrer) VALUES (@ShortenedUrlId, @ClickDate, @Referrer)", new { click.ShortenedUrlId, click.ClickDate, click.Referrer });
+
+                        _logger.LogInformation("Redirected {ShortUrl} to {LongUrl}", shortenedUrl.ShortUrl, shortenedUrl.LongUrl);
 
                         return new RedirectResult(shortenedUrl.LongUrl, false);
                     }
