@@ -1,6 +1,5 @@
 using System;
 using Babou.AspNetCore.SecurityExtensions.ContentSecurityPolicy;
-using Babou.AspNetCore.SecurityExtensions.CustomHeaders;
 using Babou.AspNetCore.SecurityExtensions.ExpectCT;
 using Babou.AspNetCore.SecurityExtensions.FeaturePolicy;
 using Babou.AspNetCore.SecurityExtensions.FrameOptions;
