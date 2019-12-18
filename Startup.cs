@@ -54,18 +54,18 @@ namespace SiteRedirectTemplate
             app.Use(async (context, next) =>
             {
                 // Request method, scheme, and path
-                logger.LogDebug("Request Method: {Method}", context.Request.Method);
-                logger.LogDebug("Request Scheme: {Scheme}", context.Request.Scheme);
-                logger.LogDebug("Request Path: {Path}", context.Request.Path);
+                logger.LogInformation("Request Method: {Method}", context.Request.Method);
+                logger.LogInformation("Request Scheme: {Scheme}", context.Request.Scheme);
+                logger.LogInformation("Request Path: {Path}", context.Request.Path);
 
                 // Headers
                 foreach (var header in context.Request.Headers)
                 {
-                    logger.LogDebug("Header: {Key}: {Value}", header.Key, header.Value);
+                    logger.LogInformation("Header: {Key}: {Value}", header.Key, header.Value);
                 }
 
                 // Connection: RemoteIp
-                logger.LogDebug("Request RemoteIp: {RemoteIpAddress}", context.Connection.RemoteIpAddress);
+                logger.LogInformation("Request RemoteIp: {RemoteIpAddress}", context.Connection.RemoteIpAddress);
 
                 await next();
             });
