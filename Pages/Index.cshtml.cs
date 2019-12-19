@@ -57,10 +57,7 @@ namespace SiteRedirectTemplate.Pages
                         if (referer.IsNullOrEmpty())
                             referer = null;
 
-                        if (referer?.Length > 500)
-                        {
-                            referer = referer.Substring(0, Math.Min(referer.Length, 500));
-                        }
+                        referer = referer.WithMaxLength(500);
 
                         var click = new AJT.Dtos.ShortenedUrlClickDto()
                         {
