@@ -82,14 +82,14 @@ namespace SiteRedirectTemplate
 
             app.UseXContentTypeOptions(XContentTypeOptions.NoSniff);
 
-            app.UseReferrerPolicy(ReferrerPolicy.UnsafeUrl);
+            app.UseReferrerPolicy(ReferrerPolicy.Origin);
 
             app.UseXRobotsTag(false, false);
 
             app.UseExpectCT(true, new TimeSpan(7,0,0,0), new Uri("https://ajtio.report-uri.com/r/d/ct/enforce"));
 
             app.UseSerilogRequestLogging();
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
