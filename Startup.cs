@@ -89,7 +89,7 @@ namespace SiteRedirectTemplate
             app.UseExpectCT(true, new TimeSpan(7,0,0,0), new Uri("https://ajtio.report-uri.com/r/d/ct/enforce"));
 
             app.UseSerilogRequestLogging();
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
