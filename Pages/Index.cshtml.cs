@@ -57,11 +57,16 @@ namespace SiteRedirectTemplate.Pages
                         if (referer.IsNullOrEmpty())
                             referer = null;
 
+                        if (referer?.Length > 500)
+                        {
+                            referer = referer.Substring(0, Math.Min(referer.Length, 500));
+                        }
+
                         var click = new AJT.Dtos.ShortenedUrlClickDto()
                         {
                             ShortenedUrlId = shortenedUrl.Id,
                             ClickDate = DateTime.Now,
-                            Referrer = referer?.Truncate(500, false)
+                            Referrer = referer
                         };
 
                         connection.Execute("INSERT INTO ShortenedUrlClicks (ShortenedUrlId, ClickDate, Referrer) VALUES (@ShortenedUrlId, @ClickDate, @Referrer)", new { click.ShortenedUrlId, click.ClickDate, click.Referrer });
