@@ -3,12 +3,11 @@ using System.Data.SqlClient;
 using BabouExtensions;
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 
 namespace SiteRedirectTemplate.Pages
 {
@@ -40,18 +39,37 @@ namespace SiteRedirectTemplate.Pages
 
                         var referer = Request.Headers["Referer"].ToString();
 
-                        if (referer.IsNullOrEmpty())
+                        try
                         {
-                            var header = Request.GetTypedHeaders();
-                            var uriReferer = header.Referer;
-                            referer = uriReferer.AbsoluteUri;
+                            if (referer.IsNullOrEmpty())
+                            {
+                                var header = Request.GetTypedHeaders();
+                                var uriReferer = header.Referer;
+
+                                if (uriReferer != null)
+                                {
+                                    referer = uriReferer.AbsoluteUri;
+                                    _logger.LogDebug("Retrieved referrer from Request.GetTypedHeaders()");
+                                }
+                                else
+                                {
+                                    _logger.LogDebug("Unable to retrieve referrer via Request.GetTypedHeaders()");
+                                }
+                            }
                         }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Attempt to retrieve header referer.");
+                        }
+
+                        if (referer.IsNullOrEmpty())
+                            referer = null;
 
                         var click = new AJT.Dtos.ShortenedUrlClickDto()
                         {
                             ShortenedUrlId = shortenedUrl.Id,
                             ClickDate = DateTime.Now,
-                            Referrer = referer.Truncate(500, false)
+                            Referrer = referer?.Truncate(500, false)
                         };
 
                         connection.Execute("INSERT INTO ShortenedUrlClicks (ShortenedUrlId, ClickDate, Referrer) VALUES (@ShortenedUrlId, @ClickDate, @Referrer)", new { click.ShortenedUrlId, click.ClickDate, click.Referrer });
