@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 
 namespace SiteRedirectTemplate.Pages
 {
@@ -46,15 +45,8 @@ namespace SiteRedirectTemplate.Pages
                                 var header = Request.GetTypedHeaders();
                                 var uriReferer = header.Referer;
 
-                                if (uriReferer != null)
-                                {
+                                if (uriReferer != null) 
                                     referer = uriReferer.AbsoluteUri;
-                                    _logger.LogDebug("Retrieved referrer from Request.GetTypedHeaders()");
-                                }
-                                else
-                                {
-                                    _logger.LogDebug("Unable to retrieve referrer via Request.GetTypedHeaders()");
-                                }
                             }
                         }
                         catch (Exception ex)
