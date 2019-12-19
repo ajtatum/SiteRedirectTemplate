@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace SiteRedirectTemplate
 {
@@ -39,7 +39,7 @@ namespace SiteRedirectTemplate
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -60,25 +60,6 @@ namespace SiteRedirectTemplate
             fordwardedHeaderOptions.KnownProxies.Clear();
 
             app.UseForwardedHeaders(fordwardedHeaderOptions);
-
-            app.Use(async (context, next) =>
-            {
-                // Request method, scheme, and path
-                logger.LogInformation("Request Method: {Method}", context.Request.Method);
-                logger.LogInformation("Request Scheme: {Scheme}", context.Request.Scheme);
-                logger.LogInformation("Request Path: {Path}", context.Request.Path);
-
-                // Headers
-                foreach (var header in context.Request.Headers)
-                {
-                    logger.LogInformation("Header: {Key}: {Value}", header.Key, header.Value);
-                }
-
-                // Connection: RemoteIp
-                logger.LogInformation("Request RemoteIp: {RemoteIpAddress}", context.Connection.RemoteIpAddress);
-
-                await next();
-            });
 
             app.UseContentSecurityPolicy(new CspDirectiveList
             {
@@ -107,6 +88,7 @@ namespace SiteRedirectTemplate
 
             app.UseExpectCT(true, new TimeSpan(7,0,0,0), new Uri("https://ajtio.report-uri.com/r/d/ct/enforce"));
 
+            app.UseSerilogRequestLogging();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
