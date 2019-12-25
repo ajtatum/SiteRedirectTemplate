@@ -34,7 +34,7 @@ namespace SiteRedirectTemplate.Pages
                         var shortenedUrl = connection.QueryFirst<AJT.Dtos.ShortenedUrlDto>("SELECT * FROM ShortenedUrls WHERE Token = @Token AND Domain = @Domain", new { Token = id, Domain = _config["Domain"] });
 
                         if (shortenedUrl == null)
-                            return new RedirectResult($"https://api.ajt.io?Message=The token {id} no longer exists.", false);
+                            return new RedirectResult($"https://babou.io?Message=The token {id} no longer exists.", false);
 
                         var referer = Request.Headers["Referer"].ToString();
 
@@ -75,7 +75,7 @@ namespace SiteRedirectTemplate.Pages
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Error with token: {Token}.", id);
-                        return new RedirectResult($"https://api.ajt.io?Message=Error: Sorry, there was an error with {id}. Sign up here to create your own short urls and more!", false);
+                        return new RedirectResult($"https://babou.io?Message=Error: Sorry, there was an error with {id}. Sign up here to create your own short urls and more!", false);
                     }
                 }
             }
