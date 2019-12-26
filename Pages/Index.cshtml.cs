@@ -36,17 +36,29 @@ namespace SiteRedirectTemplate.Pages
                         if (shortenedUrl == null)
                             return new RedirectResult($"https://babou.io?Message=The token {id} no longer exists.", false);
 
-                        var referer = Request.Headers["Referer"].ToString();
+                        var referrerUrl = string.Empty;
+
+                        if (!Request.Query["src"].ToString().IsNullOrWhiteSpace())
+                        {
+                            var srcReferrer = Request.Query["src"].ToString();
+                            if (srcReferrer.TryGetUrl(out var url))
+                            {
+                                referrerUrl = url;
+                            }
+                        }
+
+                        if (referrerUrl.IsNullOrWhiteSpace())
+                            referrerUrl = Request.Headers["Referer"].ToString();
 
                         try
                         {
-                            if (referer.IsNullOrEmpty())
+                            if (referrerUrl.IsNullOrEmpty())
                             {
                                 var header = Request.GetTypedHeaders();
                                 var uriReferer = header.Referer;
 
-                                if (uriReferer != null) 
-                                    referer = uriReferer.AbsoluteUri;
+                                if (uriReferer != null)
+                                    referrerUrl = uriReferer.AbsoluteUri;
                             }
                         }
                         catch (Exception ex)
@@ -54,21 +66,21 @@ namespace SiteRedirectTemplate.Pages
                             _logger.LogError(ex, "Attempt to retrieve header referer.");
                         }
 
-                        if (referer.IsNullOrEmpty())
-                            referer = null;
+                        if (referrerUrl.IsNullOrEmpty())
+                            referrerUrl = null;
 
-                        referer = referer.WithMaxLength(500);
+                        referrerUrl = referrerUrl.WithMaxLength(500);
 
                         var click = new AJT.Dtos.ShortenedUrlClickDto()
                         {
                             ShortenedUrlId = shortenedUrl.Id,
                             ClickDate = DateTime.Now,
-                            Referrer = referer
+                            Referrer = referrerUrl
                         };
 
                         connection.Execute("INSERT INTO ShortenedUrlClicks (ShortenedUrlId, ClickDate, Referrer) VALUES (@ShortenedUrlId, @ClickDate, @Referrer)", new { click.ShortenedUrlId, click.ClickDate, click.Referrer });
 
-                        _logger.LogInformation("Redirected {ShortUrl} to {LongUrl}. Referred by {Referrer}", shortenedUrl.ShortUrl, shortenedUrl.LongUrl, referer.IsNullOrEmpty() ? "Unknown" : referer);
+                        _logger.LogInformation("Redirected {ShortUrl} to {LongUrl}. Referred by {Referrer}", shortenedUrl.ShortUrl, shortenedUrl.LongUrl, referrerUrl.IsNullOrEmpty() ? "Unknown" : referrerUrl);
 
                         return new RedirectResult(shortenedUrl.LongUrl, false);
                     }
