@@ -64,7 +64,7 @@ namespace SiteRedirectTemplate
                         .ReadFrom.Configuration(hostingContext.Configuration)
                         .Enrich.FromLogContext()
                         .Enrich.WithExceptionDetails()
-                        .Enrich.WithProperty("Application", hostingContext.Configuration["SiteTitle"])
+                        .Enrich.WithProperty("Application", hostingContext.Configuration["LogTitle"])
                         .Enrich.WithProperty("Environment", hostingContext.HostingEnvironment.EnvironmentName)
                         .Enrich.WithProperty("BuildNumber", hostingContext.Configuration["BuildNumber"])
                         .WriteTo.MSSqlServer(hostingContext.Configuration.GetConnectionString("LogsConnection"), tableName: "Logs", columnOptions: columnOptions, autoCreateSqlTable: true, batchPostingLimit: 50, period: new TimeSpan(0, 0, 5))
