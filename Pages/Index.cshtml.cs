@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using BabouExtensions;
 using Dapper;
 using IpStack;
@@ -29,6 +31,11 @@ namespace SiteRedirectTemplate.Pages
         {
             if (id != null)
             {
+                var blockPathList = _config["BlockedPaths"].Split(';').ToList();
+
+                if (blockPathList.Contains(id))
+                    return new UnauthorizedResult();
+
                 var sqlConnectionString = _config.GetConnectionString("DefaultConnection");
 
                 using (var connection = new SqlConnection(sqlConnectionString))
